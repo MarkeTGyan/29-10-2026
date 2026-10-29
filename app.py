@@ -62,7 +62,7 @@ button{border:0;border-radius:10px;padding:14px 20px;background:var(--gold);colo
 .hint{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .metric{background:#0a1425;border:1px solid var(--line);border-radius:12px;padding:15px}.metric small{display:block;color:var(--muted);margin-bottom:8px}.metric strong{font-size:24px;overflow-wrap:anywhere}
 .green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}h2{font-size:22px;margin:0 0 14px}h3{margin:0 0 8px}.section{margin-top:22px}.copy{line-height:1.75;color:#e4ecf8}.tag{display:inline-block;padding:6px 10px;border-radius:20px;background:#24344c;color:var(--gold);font-size:13px;font-weight:bold}
-table{width:100%;border-collapse:collapse;margin-bottom:20px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:11px 8px;vertical-align:top}th{color:var(--muted)}.error{color:var(--red);white-space:pre-wrap}.hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:11px 8px;vertical-align:top}th{color:var(--muted)}.error{color:var(--red);white-space:pre-wrap}.hidden{display:none}.saved-table-wrap{overflow-x:auto}.saved-table{min-width:1050px}.saved-actions{display:flex;gap:6px;flex-wrap:wrap}.small-btn{padding:8px 11px;font-size:13px;border-radius:7px}.delete-btn{background:#fb7185;color:#1c2433}.open-btn{background:#4ade80;color:#102018}.empty-row{text-align:center;color:var(--muted);padding:18px}
 footer{color:var(--muted);font-size:12px;line-height:1.6;padding:18px 0 30px}
 
 /* Tab Layout CSS */
@@ -76,19 +76,19 @@ footer{color:var(--muted);font-size:12px;line-height:1.6;padding:18px 0 30px}
 <body><main>
 <header><div class="tag">MarkeTGyan, Technical Analysis Scanner</div>
 <h1>AI Stock Analyst & Screener</h1>
-<div class="sub">स्टॉक का विश्लेषण करें या लाइव स्क्रीनर्स देखें।</div></header>
+<div class="sub">एक ही स्टॉक के तकनीकी संकेतक, सपोर्ट/रेजिस्टेंस, वित्तीय स्थिति और डेटा-आधारित समग्र विश्लेषण।</div></header>
 
-<div class="tab-buttons">
-  <button class="tab-btn active" onclick="openTab('searchTab', this)">🔍 Single Stock Analyst</button>
-  <button class="tab-btn" onclick="openTab('volumeTab', this); fetchVolumeStocks();">🔥 TODAYS ACTIVE STOCKS</button>
-  <button class="tab-btn" onclick="openTab('gapupTab', this); fetchGapUpStocks();">🚀 TODAYS ACTIVE STOCKS 1 AM</button>
+<!-- Top tabs -->
+<div class="tab-buttons" role="tablist" aria-label="स्टॉक विश्लेषण टैब">
+  <button type="button" class="tab-btn active" data-tab-target="searchTab">🔎 नया विश्लेषण</button>
+  <button type="button" class="tab-btn" data-tab-target="savedTab">🗂️ पूर्व विश्लेषित सभी स्टॉक्स</button>
 </div>
 
 <!-- Tab 1: Single Stock Analysis -->
 <div id="searchTab" class="tab-content active">
   <div class="panel">
   <form id="stockForm"><input id="symbol" placeholder="उदाहरण: CIPLA, RELIANCE, TCS, ZOMATO" required autocomplete="off"><button id="go" type="submit">विश्लेषण करें ↗</button></form>
-  <div class="hint">भारतीय शेयर के लिए NSE symbol लिखें (जैसे CIPLA)।</div>
+  <div class="hint">भारतीय शेयर के लिए NSE symbol लिखें (जैसे CIPLA)। सफल विश्लेषण के बाद स्टॉक अपने-आप “पूर्व विश्लेषित सभी स्टॉक्स” टैब में सेव होगा।</div>
   </div>
   <div id="status" class="panel hidden"></div>
   <div id="results" class="hidden">
@@ -96,32 +96,25 @@ footer{color:var(--muted);font-size:12px;line-height:1.6;padding:18px 0 30px}
   <div class="panel"><h2>🧭 Trend और Momentum</h2><div id="trend" class="copy"></div></div>
   
   <div class="panel"><h2>📊 Daily Support/Resistance</h2><div id="dailyLevels"></div></div>
+  <div class="panel"><h2>📋 डेली S/R आधारित Entry, Stop Loss और Target योजना</h2><div id="dailyTradePlan"></div><p class="copy"><b>SEBI डिस्क्लेमर:</b> MarkeTGyan SEBI-पंजीकृत निवेश सलाहकार नहीं है। यह तालिका केवल शैक्षिक उद्देश्य के लिए उपलब्ध ऐतिहासिक डेटा से बने संभावित स्तर दिखाती है; यह खरीदने/बेचने की व्यक्तिगत सलाह नहीं है। ट्रेड से पहले स्वयं पुष्टि करें और जोखिम समझें।</p></div>
   <div class="panel"><h2>⏱️ 1HR Support/Resistance</h2><div id="hourlyLevels"></div></div>
+  <div class="panel"><h2>📋 1 घंटे के S/R आधारित Entry, Stop Loss और Target योजना</h2><div id="hourlyTradePlan"></div><p class="copy"><b>SEBI डिस्क्लेमर:</b> MarkeTGyan SEBI-पंजीकृत निवेश सलाहकार नहीं है। यह तालिका केवल शैक्षिक उद्देश्य के लिए उपलब्ध ऐतिहासिक डेटा से बने संभावित स्तर दिखाती है; यह खरीदने/बेचने की व्यक्तिगत सलाह नहीं है। ट्रेड से पहले स्वयं पुष्टि करें और जोखिम समझें।</p></div>
 
   <div class="panel"><h2>🏢 कंपनी की वित्तीय स्थिति (Financials)</h2><div id="fundamentals"></div></div>
   <div class="panel"><h2>📊 Shareholding Pattern</h2><div id="shareholding"></div></div>
   <div class="panel"><h2>🧠 AI-जैसा निष्कर्ष</h2><div id="verdict" class="copy"></div></div>
   <div class="panel"><h2>⚠️ Risk Checklist</h2><div id="risks" class="copy"></div></div>
+  <div class="panel"><h2>📝 उपलब्ध डेटा के आधार पर समग्र विश्लेषण नोट</h2><div id="analysisNote" class="copy"></div></div>
   </div>
 </div>
 
-<!-- Tab 2: Volume Active Stocks (Green Top & Red Bottom Separated) -->
-<div id="volumeTab" class="tab-content">
+<!-- Tab 2: Previously analyzed stocks -->
+<div id="savedTab" class="tab-content">
   <div class="panel">
-    <div id="volStatus" class="status-msg">डेटा शुरू करने के लिए टैब खोलें।</div>
-    <div class="progress-track"><div id="volProgress" class="progress-fill"></div></div>
-    <div id="volProgressText" class="progress-caption"></div>
-    <div id="volTable"></div>
-  </div>
-</div>
-
-<!-- Tab 3: Chartink Custom Screener Top 50 -->
-<div id="gapupTab" class="tab-content">
-  <div class="panel">
-    <div id="gapStatus" class="status-msg">डेटा शुरू करने के लिए टैब खोलें।</div>
-    <div class="progress-track"><div id="gapProgress" class="progress-fill"></div></div>
-    <div id="gapProgressText" class="progress-caption"></div>
-    <div id="gapTable"></div>
+    <h2>🗂️ पूर्व विश्लेषण के लिए डाले गए सभी स्टॉक्स</h2>
+    <p class="copy">यहाँ उन स्टॉक्स का रिकॉर्ड दिखाई देगा जिनका विश्लेषण सफलतापूर्वक किया गया है। नवीनतम विश्लेषण ऊपर दिखेगा। किसी स्टॉक को दोबारा देखने के लिए <b>फिर देखें</b> और रिकॉर्ड हटाने के लिए <b>Delete</b> दबाएँ। रिकॉर्ड इसी ब्राउज़र के Local Storage में रहता है।</p>
+    <div id="savedStockMessage" class="hint"></div>
+    <div class="saved-table-wrap"><table class="saved-table"><thead><tr><th>कंपनी / स्टॉक</th><th>अंतिम भाव</th><th>दैनिक बदलाव</th><th>Daily Support</th><th>Daily Resistance</th><th>1HR Support</th><th>1HR Resistance</th><th>ट्रेंड</th><th>विश्लेषण समय</th><th>विकल्प</th></tr></thead><tbody id="savedStocksBody"><tr><td colspan="10" class="empty-row">अभी कोई स्टॉक सेव नहीं है।</td></tr></tbody></table></div>
   </div>
 </div>
 
@@ -134,12 +127,62 @@ function fmt(v, suffix=''){if(v===null||v===undefined||!Number.isFinite(Number(v
 function metric(label,value,cls=''){return `<div class="metric"><small>${label}</small><strong class="${cls}">${value}</strong></div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function table(rows){return '<table><tbody>'+rows.map(r=>'<tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>').join('')+'</tbody></table>'}
-
-function openTab(tabId, btn) {
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  $(tabId).classList.add('active');
-  btn.classList.add('active');
+function switchTab(tabId){
+ document.querySelectorAll('.tab-content').forEach(el=>el.classList.toggle('active',el.id===tabId));
+ document.querySelectorAll('[data-tab-target]').forEach(el=>el.classList.toggle('active',el.getAttribute('data-tab-target')===tabId));
+ if(tabId==='savedTab')renderSavedStocks();
+}
+document.querySelectorAll('[data-tab-target]').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.getAttribute('data-tab-target'))));
+const SAVED_STOCKS_KEY='markeTGyan_saved_stock_analyses_v1';
+function readSavedStocks(){
+ try{const raw=localStorage.getItem(SAVED_STOCKS_KEY);const parsed=raw?JSON.parse(raw):[];return Array.isArray(parsed)?parsed:[];}
+ catch(e){return [];}
+}
+function writeSavedStocks(items){
+ try{localStorage.setItem(SAVED_STOCKS_KEY,JSON.stringify(items));$('savedStockMessage').textContent='';return true;}
+ catch(e){$('savedStockMessage').textContent='ब्राउज़र में रिकॉर्ड सेव नहीं हो पाया। Browser storage settings जाँचें।';return false;}
+}
+function renderSavedStocks(){
+ const items=readSavedStocks();
+ if(!items.length){$('savedStocksBody').innerHTML='<tr><td colspan="10" class="empty-row">अभी कोई स्टॉक सेव नहीं है।</td></tr>';return;}
+ $('savedStocksBody').innerHTML=items.map((x,i)=>'<tr>'+
+ '<td><b>'+esc(x.company||x.symbol)+'</b><br><span class="tag">'+esc(x.symbol)+'</span></td>'+
+ '<td>'+esc(fmt(x.price,' '+(x.currency||'')))+'</td>'+
+ '<td class="'+(Number(x.change_pct)>0?'green':Number(x.change_pct)<0?'red':'')+'">'+esc(fmt(x.change_pct,'%'))+'</td>'+
+ '<td>'+esc(fmt(x.support,' '+(x.currency||'')))+'</td><td>'+esc(fmt(x.resistance,' '+(x.currency||'')))+'</td>'+
+ '<td>'+esc(fmt(x.support_1hr,' '+(x.currency||'')))+'</td><td>'+esc(fmt(x.resistance_1hr,' '+(x.currency||'')))+'</td>'+
+ '<td>'+esc(x.score_label||'उपलब्ध नहीं')+'</td><td>'+esc(x.as_of||x.saved_at||'उपलब्ध नहीं')+'</td>'+
+ '<td><div class="saved-actions"><button type="button" class="small-btn open-btn" data-open-stock="'+esc(x.symbol)+'">फिर देखें</button><button type="button" class="small-btn delete-btn" data-delete-stock="'+esc(x.symbol)+'">Delete</button></div></td></tr>').join('');
+}
+function saveStockAnalysis(d){
+ const symbol=String(d.symbol||$('symbol').value||'').trim().toUpperCase();if(!symbol)return;
+ const items=readSavedStocks();
+ const entry={symbol,company:d.company||symbol,price:d.price,change_pct:d.change_pct,support:d.support,resistance:d.resistance,support_1hr:d.support_1hr,resistance_1hr:d.resistance_1hr,score_label:d.score_label,currency:d.currency,as_of:d.as_of,saved_at:new Date().toLocaleString('en-IN')};
+ const oldIndex=items.findIndex(x=>String(x.symbol||'').toUpperCase()===symbol);
+ if(oldIndex>=0)items.splice(oldIndex,1);
+ items.unshift(entry);
+ if(items.length>100)items.length=100;
+ writeSavedStocks(items);renderSavedStocks();
+}
+$('savedStocksBody').addEventListener('click',e=>{
+ const del=e.target.closest('[data-delete-stock]');
+ if(del){const symbol=del.getAttribute('data-delete-stock');const items=readSavedStocks().filter(x=>String(x.symbol||'').toUpperCase()!==String(symbol).toUpperCase());writeSavedStocks(items);renderSavedStocks();return;}
+ const open=e.target.closest('[data-open-stock]');
+ if(open){$('symbol').value=open.getAttribute('data-open-stock');switchTab('searchTab');$('stockForm').requestSubmit();}
+});
+renderSavedStocks();
+function tradePlanTable(support, resistance, currency, timeframe){
+ const s=Number(support), r=Number(resistance), cur=currency||'';
+ if(!Number.isFinite(s)||!Number.isFinite(r)||s<=0||r<=s){
+  return '<p class="error">इस समय '+esc(timeframe)+' के लिए वैध सपोर्ट और रेजिस्टेंस उपलब्ध नहीं हैं; इसलिए Entry/SL/Target नहीं निकाले गए।</p>';
+ }
+ const range=r-s, fmtP=v=>fmt(v,' '+cur);
+ const rows=[
+  ['सेटअप','एंट्री ट्रिगर','Entry स्तर','Stop Loss','Target 1','Target 2'],
+  ['BUY (ब्रेकआउट)','रेजिस्टेंस के ऊपर कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(r),fmtP(r-range*0.25),fmtP(r+range*0.5),fmtP(r+range)],
+  ['SELL (ब्रेकडाउन)','सपोर्ट के नीचे कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(s),fmtP(s+range*0.25),fmtP(s-range*0.5),fmtP(s-range)]
+ ];
+ return '<div style="overflow-x:auto"><table><thead><tr>'+rows[0].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(1).map(row=>'<tr>'+row.map((x,i)=>'<td>'+(i===0?'<b>'+esc(x)+'</b>':esc(x))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="copy"><b>गणना का आधार:</b> Support–Resistance की दूरी का 25% स्टॉप-लॉस बफर, 0.5× दूरी Target 1 और 1× दूरी Target 2 के रूप में दिखाया गया है। ये नियम-आधारित अनुमान हैं, निश्चित परिणाम नहीं। गैप, स्लिपेज, शुल्क और वोलैटिलिटी से वास्तविक जोखिम बदल सकता है। यदि लक्ष्य/स्टॉप भाव शून्य से नीचे हो या स्तर अमान्य हों तो ट्रेड न लें।</p>';
 }
 
 // Single Stock Search
@@ -149,6 +192,7 @@ $('stockForm').addEventListener('submit',async e=>{
  try{
   const r=await fetch('/api/analyze?symbol='+encodeURIComponent(sym));const d=await r.json();
   if(!r.ok)throw new Error(d.error||'डेटा प्राप्त नहीं हुआ');
+  saveStockAnalysis(d);
   $('status').classList.add('hidden');$('results').classList.remove('hidden');
   $('company').innerHTML=`<h2>${esc(d.company)} <span class="tag">${esc(d.symbol)}</span></h2><div class="sub">डेटा समय: ${esc(d.as_of)}</div>`;
   $('metrics').innerHTML=[
@@ -173,6 +217,8 @@ $('stockForm').addEventListener('submit',async e=>{
     ['सपोर्ट (1HR)', fmt(d.support_1hr,' '+(d.currency||''))],
     ['रेजिस्टेंस (1HR)', fmt(d.resistance_1hr,' '+(d.currency||''))]
   ]);
+  $('dailyTradePlan').innerHTML=tradePlanTable(d.support,d.resistance,d.currency,'Daily');
+  $('hourlyTradePlan').innerHTML=tradePlanTable(d.support_1hr,d.resistance_1hr,d.currency,'1HR');
   
   $('fundamentals').innerHTML=table([
     ['Market Cap', d.market_cap],
@@ -200,6 +246,27 @@ $('stockForm').addEventListener('submit',async e=>{
 
   $('verdict').innerHTML=`<p><b>संकेत:</b> <span class="${d.score>=2?'green':d.score<=-2?'red':'gold'}">${esc(d.score_label)}</span></p><p>${esc(d.verdict)}</p>`;
   $('risks').innerHTML='<ul>'+d.risks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+  // निष्कर्ष केवल इसी स्टॉक के ऊपर दिखाए गए API डेटा से तैयार किया जाता है।
+  const note = [];
+  const num = v => (v === null || v === undefined || String(v).trim() === '' ? NaN : Number(v));
+  const px = num(d.price), ch = num(d.change_pct), rsi = num(d.rsi);
+  const sup = num(d.support), res = num(d.resistance);
+  const sup1 = num(d.support_1hr), res1 = num(d.resistance_1hr);
+  const valid = v => Number.isFinite(v);
+  note.push(`<p><b>1. भाव और दैनिक चाल:</b> ${valid(px) ? `अंतिम उपलब्ध बंद भाव ${fmt(px, ' ' + (d.currency||''))}` : 'भाव उपलब्ध नहीं'}। ${valid(ch) ? `दैनिक बदलाव ${ch>0?'+':''}${fmt(ch,'%')} है, इसलिए उपलब्ध सत्र में ${ch>0?'तेजी':ch<0?'कमजोरी':'लगभग कोई बदलाव नहीं'} दिखता है।` : 'दैनिक बदलाव का भरोसेमंद आँकड़ा उपलब्ध नहीं है।'}</p>`);
+  note.push(`<p><b>2. ट्रेंड और मूविंग एवरेज:</b> ${esc(d.trend || 'ट्रेंड का स्पष्ट विवरण उपलब्ध नहीं')}। ${esc(d.ma_comment || 'मूविंग एवरेज पर टिप्पणी उपलब्ध नहीं')}। ट्रेंड स्कोर/लेबल: <b>${esc(d.score_label || 'उपलब्ध नहीं')}</b>। केवल लेबल के आधार पर ट्रेड न लें; भाव का स्तर और कन्फर्मेशन भी देखें।</p>`);
+  note.push(`<p><b>3. RSI और MACD:</b> ${valid(rsi) ? `RSI ${fmt(rsi)} है${rsi>=70?' — यह ओवरबॉट क्षेत्र के करीब/ऊपर है; नई खरीद में सावधानी रखें।':rsi<=30?' — यह ओवरसोल्ड क्षेत्र के करीब/नीचे है; केवल इसी आधार पर खरीद न करें।':' — यह 30–70 के बीच है, इसलिए अकेले RSI से मजबूत ओवरबॉट/ओवरसोल्ड संकेत नहीं मिलता।'}` : 'RSI का संख्यात्मक मान उपलब्ध नहीं है।'} ${esc(d.rsi_comment || '')} ${esc(d.macd_comment || '')}</p>`);
+  note.push(`<p><b>4. डेली सपोर्ट/रेजिस्टेंस:</b> सपोर्ट ${valid(sup)?fmt(sup,' '+(d.currency||'')):'उपलब्ध नहीं'} और रेजिस्टेंस ${valid(res)?fmt(res,' '+(d.currency||'')):'उपलब्ध नहीं'}। ${valid(px)&&valid(sup)&&valid(res)?(px<=sup?'भाव डेली सपोर्ट के पास/नीचे है; सपोर्ट टूटने पर कमजोरी बढ़ सकती है, जबकि वापसी की पुष्टि जरूरी है।':px>=res?'भाव डेली रेजिस्टेंस के पास/ऊपर है; ब्रेकआउट टिकने और वॉल्यूम/क्लोजिंग से पुष्टि पर ध्यान दें।':'भाव दिए गए डेली सपोर्ट और रेजिस्टेंस के बीच है; बीच के क्षेत्र में जोखिम-इनाम स्पष्ट करके ही निर्णय लें।'):'इन स्तरों के आधार पर भाव की स्थिति पूरी तरह तय नहीं की जा सकती।'}</p>`);
+  note.push(`<p><b>5. एक घंटे के स्तर:</b> सपोर्ट ${valid(sup1)?fmt(sup1,' '+(d.currency||'')):'उपलब्ध नहीं'} और रेजिस्टेंस ${valid(res1)?fmt(res1,' '+(d.currency||'')):'उपलब्ध नहीं'}। इन स्तरों को छोटे समय-फ्रेम की योजना के लिए देखें; डेली ट्रेंड के विरुद्ध ट्रेड लेने से पहले अतिरिक्त पुष्टि जरूरी है।</p>`);
+  const fundamentals = [d.market_cap,d.debt_equity,d.pe,d.pb,d.roe,d.roce,d.profit_margin,d.sales_growth,d.profit_growth];
+  const knownFundamentals = fundamentals.filter(v => v !== null && v !== undefined && String(v).trim() && !/उपलब्ध नहीं|^nan$|^none$/i.test(String(v).trim())).length;
+  const debtText = String(d.debt_equity ?? '').trim();
+  const pledgeText = String(d.promoter_pledge ?? '').trim();
+  note.push(`<p><b>6. कंपनी की वित्तीय स्थिति:</b> प्रमुख वित्तीय मदों में से ${knownFundamentals}/9 के लिए कोई मान उपलब्ध है। Debt-to-Equity: ${esc(debtText || 'उपलब्ध नहीं')}; P/E: ${esc(d.pe ?? 'उपलब्ध नहीं')}; P/B: ${esc(d.pb ?? 'उपलब्ध नहीं')}; ROE/ROCE: ${esc(d.roe ?? 'उपलब्ध नहीं')} / ${esc(d.roce ?? 'उपलब्ध नहीं')}। Promoter pledge: ${esc(pledgeText || 'उपलब्ध नहीं')}। इन अनुपातों का अर्थ उद्योग और पुराने वर्षों के आँकड़ों से तुलना करके ही निकालें; खाली/अनुपलब्ध डेटा को सकारात्मक संकेत न मानें।</p>`);
+  note.push(`<p><b>7. शेयरहोल्डिंग:</b> Promoter ${esc(d.promoter_holding ?? 'उपलब्ध नहीं')}, FII ${esc(d.fii_holding ?? 'उपलब्ध नहीं')}, DII ${esc(d.dii_holding ?? 'उपलब्ध नहीं')}, Public ${esc(d.public_holding ?? 'उपलब्ध नहीं')}। केवल एक अवधि की हिस्सेदारी से खरीद/बिक्री का निष्कर्ष नहीं निकालना चाहिए; पिछली तिमाहियों के बदलाव भी देखें।</p>`);
+  note.push(`<p><b>समग्र निष्कर्ष:</b> ${esc(d.verdict || 'कोई स्पष्ट निष्कर्ष उपलब्ध नहीं है')} ${valid(ch)&&ch<0?'दैनिक बदलाव नकारात्मक है, इसलिए जल्दबाजी में खरीदने से बचें।':valid(ch)&&ch>0?'दैनिक बदलाव सकारात्मक है, लेकिन रेजिस्टेंस और जोखिम-इनाम की जाँच जरूरी है.':'अगला कदम तय करने से पहले भाव, स्तर और संकेतकों की पुष्टि करें।'} ${knownFundamentals<5?'वित्तीय आँकड़े आंशिक हैं, इसलिए कंपनी की गुणवत्ता पर निष्कर्ष सीमित रखें.':'तकनीकी संकेतों के साथ वित्तीय आँकड़ों की तुलना भी करें.'}</p>`);
+  note.push('<p><b>कार्रवाई से पहले:</b> स्टॉप-लॉस, पोजीशन साइज और जोखिम-इनाम तय करें; केवल इस नोट के आधार पर ट्रेड न करें। यह उपलब्ध डेटा का नियम-आधारित सार है, भविष्य की गारंटी या व्यक्तिगत निवेश सलाह नहीं।</p>');
+  $('analysisNote').innerHTML = note.join('');
  }catch(err){$('status').innerHTML='<div class="error">विश्लेषण नहीं हो पाया: '+esc(err.message)+'</div>'}
  finally{$('go').disabled=false;$('go').textContent='विश्लेषण करें ↗'}
 });
@@ -319,10 +386,6 @@ function renderGapTable(data) {
   $('gapTable').innerHTML = html;
 }
 
-setInterval(() => {
-  if($('volumeTab').classList.contains('active')) fetchVolumeStocks();
-  if($('gapupTab').classList.contains('active')) fetchGapUpStocks();
-}, 300000);
 </script></body></html>
 """
 
@@ -663,73 +726,71 @@ def fetch_single_stock_data(symbol):
     return None
 
 def get_chartink_screener_stocks():
-    """
-    Read stocks only from the user's specified Chartink screener.
-    Never substitute a hard-coded list if Chartink returns no results.
-    Return every parsed screener row sorted by volume, highest first.
-    """
     chartink_url = "https://chartink.com/screener/copy-daily-close-above-previous-high-50"
     results = []
     try:
-        # Establish Chartink session/cookies, then request the exact screener URL.
-        session.get("https://chartink.com", headers=get_headers(), timeout=15)
-        resp = session.get(chartink_url, headers=get_headers(), timeout=20)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
-
-        # Parse every data row available in the screener's rendered tables.
-        for table in soup.find_all("table"):
-            rows = table.find_all("tr")
-            for tr in rows[1:]:
-                tds = tr.find_all("td")
-                if len(tds) < 7:
-                    continue
-
-                symbol = tds[2].get_text(" ", strip=True).upper()
-                close_price = clean_num(tds[3].get_text(" ", strip=True))
-                change_value = clean_num(tds[4].get_text(" ", strip=True))
-                volume_raw = tds[6].get_text(" ", strip=True).replace(",", "").strip()
-
-                try:
-                    volume_value = float(volume_raw)
-                except (TypeError, ValueError):
-                    continue
-
-                if not symbol or not math.isfinite(volume_value) or volume_value < 0:
-                    continue
-                if close_price is None or not math.isfinite(float(close_price)):
-                    continue
-                if change_value is None or not math.isfinite(float(change_value)):
-                    change_value = 0.0
-                if symbol in {"SYMBOL", "STOCK", "NAME"}:
-                    continue
-
-                ticker_symbol = symbol if symbol.endswith((".NS", ".BO")) else symbol + ".NS"
-                ist_now = datetime.utcnow() + timedelta(hours=5, minutes=30)
+        session.get("https://chartink.com", headers=get_headers(), timeout=10)
+        resp = session.get(chartink_url, headers=get_headers(), timeout=10)
+        if resp.status_code == 200:
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            table = soup.find('table')
+            if table:
+                for tr in table.find_all('tr')[1:]:
+                    tds = tr.find_all('td')
+                    if len(tds) >= 7:
+                        symbol = tds[2].text.strip().upper()
+                        close_price = clean_num(tds[3].text.strip())
+                        chg_val = clean_num(tds[4].text.strip())
+                        vol_raw = tds[6].text.strip().replace(',', '')
+                        vol_val = float(vol_raw) if vol_raw.replace('.', '', 1).isdigit() else 0.0
+                        if not math.isfinite(vol_val) or vol_val < 0:
+                            vol_val = 0.0
+                        if close_price is None:
+                            close_price = 0.0
+                        if chg_val is None or not math.isfinite(float(chg_val)):
+                            chg_val = 0.0
+                        
+                        if symbol:
+                            sym_ns = symbol if symbol.endswith('.NS') else symbol + '.NS'
+                            ist_now = datetime.utcnow() + timedelta(hours=5, minutes=30)
+                            results.append({
+                                "symbol": symbol,
+                                "price": close_price if close_price is not None else 0.0,
+                                "change": chg_val if chg_val is not None else 0.0,
+                                "volume": vol_val,
+                                "volume_formatted": human_large(vol_val),
+                                "update_time": ist_now.strftime("%d-%m-%Y %H:%M:%S"),
+                                "ticker_symbol": sym_ns
+                            })
+    except Exception:
+        pass
+    
+    if not results:
+        fallback_syms = [
+            "OLAELEC.NS", "PPLPHARMA.NS", "JYOTISTRUC.NS", "SYNGENE.NS", "PATANJALI.NS", 
+            "SBFC.NS", "PGEL.NS", "AARTIDRUGS.NS", "PNGSREVA.NS", "RAMKY.NS", 
+            "PASHUPATI.NS", "DCMSRIND.NS", "SAKUMA.NS", "HUBTOWN.NS", "HILINFRA.NS", 
+            "FDC.NS", "OMNI.NS", "TIPSMUSIC.NS"
+        ]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            data_list = list(executor.map(fetch_single_stock_data, fallback_syms))
+        for res in data_list:
+            if res:
                 results.append({
-                    "symbol": symbol.replace(".NS", "").replace(".BO", ""),
-                    "price": close_price,
-                    "change": change_value,
-                    "volume": volume_value,
-                    "volume_formatted": human_large(volume_value),
-                    "update_time": ist_now.strftime("%d-%m-%Y %H:%M:%S"),
-                    "ticker_symbol": ticker_symbol
+                    "symbol": res["symbol"],
+                    "price": res["price"],
+                    "change": res["change"],
+                    "volume": res["volume"],
+                    "volume_formatted": res["volume_formatted"],
+                    "update_time": res["update_time"],
+                    "ticker_symbol": res["symbol"] + ".NS",
+                    "weekly_sr": res.get("weekly_sr", "उपलब्ध नहीं"),
+                    "daily_sr": res.get("daily_sr", "उपलब्ध नहीं"),
+                    "hourly_sr": res.get("hourly_sr", "उपलब्ध नहीं")
                 })
-
-        # De-duplicate repeated rows, preserving the latest row for each symbol.
-        unique_results = {}
-        for item in results:
-            unique_results[item["symbol"]] = item
-        results = list(unique_results.values())
-
-        # Keep every stock returned by this Chartink screener, highest volume first.
-        results.sort(key=lambda item: item.get("volume", 0), reverse=True)
-        return results
-
-    except Exception as exc:
-        # Do not show unrelated fallback symbols when Chartink is unavailable.
-        app.logger.exception("Chartink screener fetch failed: %s", exc)
-        return []
+                
+    results.sort(key=lambda x: x["volume"], reverse=True)
+    return results[:50]
 
 def extract_screener_complete_data(symbol):
     clean_sym = symbol.replace(".NS", "").replace(".BO", "").strip().upper()
