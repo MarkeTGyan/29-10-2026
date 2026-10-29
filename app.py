@@ -663,71 +663,73 @@ def fetch_single_stock_data(symbol):
     return None
 
 def get_chartink_screener_stocks():
+    """
+    Read stocks only from the user's specified Chartink screener.
+    Never substitute a hard-coded list if Chartink returns no results.
+    Return every parsed screener row sorted by volume, highest first.
+    """
     chartink_url = "https://chartink.com/screener/copy-daily-close-above-previous-high-50"
     results = []
     try:
-        session.get("https://chartink.com", headers=get_headers(), timeout=10)
-        resp = session.get(chartink_url, headers=get_headers(), timeout=10)
-        if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            table = soup.find('table')
-            if table:
-                for tr in table.find_all('tr')[1:]:
-                    tds = tr.find_all('td')
-                    if len(tds) >= 7:
-                        symbol = tds[2].text.strip().upper()
-                        close_price = clean_num(tds[3].text.strip())
-                        chg_val = clean_num(tds[4].text.strip())
-                        vol_raw = tds[6].text.strip().replace(',', '')
-                        vol_val = float(vol_raw) if vol_raw.replace('.', '', 1).isdigit() else 0.0
-                        if not math.isfinite(vol_val) or vol_val < 0:
-                            vol_val = 0.0
-                        if close_price is None:
-                            close_price = 0.0
-                        if chg_val is None or not math.isfinite(float(chg_val)):
-                            chg_val = 0.0
-                        
-                        if symbol:
-                            sym_ns = symbol if symbol.endswith('.NS') else symbol + '.NS'
-                            ist_now = datetime.utcnow() + timedelta(hours=5, minutes=30)
-                            results.append({
-                                "symbol": symbol,
-                                "price": close_price if close_price is not None else 0.0,
-                                "change": chg_val if chg_val is not None else 0.0,
-                                "volume": vol_val,
-                                "volume_formatted": human_large(vol_val),
-                                "update_time": ist_now.strftime("%d-%m-%Y %H:%M:%S"),
-                                "ticker_symbol": sym_ns
-                            })
-    except Exception:
-        pass
-    
-    if not results:
-        fallback_syms = [
-            "OLAELEC.NS", "PPLPHARMA.NS", "JYOTISTRUC.NS", "SYNGENE.NS", "PATANJALI.NS", 
-            "SBFC.NS", "PGEL.NS", "AARTIDRUGS.NS", "PNGSREVA.NS", "RAMKY.NS", 
-            "PASHUPATI.NS", "DCMSRIND.NS", "SAKUMA.NS", "HUBTOWN.NS", "HILINFRA.NS", 
-            "FDC.NS", "OMNI.NS", "TIPSMUSIC.NS"
-        ]
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            data_list = list(executor.map(fetch_single_stock_data, fallback_syms))
-        for res in data_list:
-            if res:
+        # Establish Chartink session/cookies, then request the exact screener URL.
+        session.get("https://chartink.com", headers=get_headers(), timeout=15)
+        resp = session.get(chartink_url, headers=get_headers(), timeout=20)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        # Parse every data row available in the screener's rendered tables.
+        for table in soup.find_all("table"):
+            rows = table.find_all("tr")
+            for tr in rows[1:]:
+                tds = tr.find_all("td")
+                if len(tds) < 7:
+                    continue
+
+                symbol = tds[2].get_text(" ", strip=True).upper()
+                close_price = clean_num(tds[3].get_text(" ", strip=True))
+                change_value = clean_num(tds[4].get_text(" ", strip=True))
+                volume_raw = tds[6].get_text(" ", strip=True).replace(",", "").strip()
+
+                try:
+                    volume_value = float(volume_raw)
+                except (TypeError, ValueError):
+                    continue
+
+                if not symbol or not math.isfinite(volume_value) or volume_value < 0:
+                    continue
+                if close_price is None or not math.isfinite(float(close_price)):
+                    continue
+                if change_value is None or not math.isfinite(float(change_value)):
+                    change_value = 0.0
+                if symbol in {"SYMBOL", "STOCK", "NAME"}:
+                    continue
+
+                ticker_symbol = symbol if symbol.endswith((".NS", ".BO")) else symbol + ".NS"
+                ist_now = datetime.utcnow() + timedelta(hours=5, minutes=30)
                 results.append({
-                    "symbol": res["symbol"],
-                    "price": res["price"],
-                    "change": res["change"],
-                    "volume": res["volume"],
-                    "volume_formatted": res["volume_formatted"],
-                    "update_time": res["update_time"],
-                    "ticker_symbol": res["symbol"] + ".NS",
-                    "weekly_sr": res.get("weekly_sr", "उपलब्ध नहीं"),
-                    "daily_sr": res.get("daily_sr", "उपलब्ध नहीं"),
-                    "hourly_sr": res.get("hourly_sr", "उपलब्ध नहीं")
+                    "symbol": symbol.replace(".NS", "").replace(".BO", ""),
+                    "price": close_price,
+                    "change": change_value,
+                    "volume": volume_value,
+                    "volume_formatted": human_large(volume_value),
+                    "update_time": ist_now.strftime("%d-%m-%Y %H:%M:%S"),
+                    "ticker_symbol": ticker_symbol
                 })
-                
-    results.sort(key=lambda x: x["volume"], reverse=True)
-    return results[:50]
+
+        # De-duplicate repeated rows, preserving the latest row for each symbol.
+        unique_results = {}
+        for item in results:
+            unique_results[item["symbol"]] = item
+        results = list(unique_results.values())
+
+        # Keep every stock returned by this Chartink screener, highest volume first.
+        results.sort(key=lambda item: item.get("volume", 0), reverse=True)
+        return results
+
+    except Exception as exc:
+        # Do not show unrelated fallback symbols when Chartink is unavailable.
+        app.logger.exception("Chartink screener fetch failed: %s", exc)
+        return []
 
 def extract_screener_complete_data(symbol):
     clean_sym = symbol.replace(".NS", "").replace(".BO", "").strip().upper()
