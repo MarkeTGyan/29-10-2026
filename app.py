@@ -251,8 +251,8 @@ function tradePlanTable(support, resistance, currency, timeframe){
  const range=r-s, fmtP=v=>fmt(v,' '+cur);
  const rows=[
   ['सेटअप','एंट्री ट्रिगर','Entry स्तर','Stop Loss','Target 1','Target 2'],
-  ['BUY (ब्रेकआउट)','रेजिस्टेंस के ऊपर कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(r),fmtP(r-range*0.25),fmtP(r+range*0.5),fmtP(r+range)],
-  ['SELL (ब्रेकडाउन)','सपोर्ट के नीचे कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(s),fmtP(s+range*0.25),fmtP(s-range*0.5),fmtP(s-range)]
+  ['SELL/BUY (ब्रेकआउट BUY/ब्रेकडाउन SELL)','रेजिस्टेंस के ऊपर कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(r),fmtP(r-range*0.25),fmtP(r+range*0.5),fmtP(r+range)],
+  ['BUY/SELL (ब्रेकडाउन SELL/ब्रेकआउट BUY/)','सपोर्ट के नीचे कैंडल क्लोज और पुनः जाँच/कन्फर्मेशन के बाद',fmtP(s),fmtP(s+range*0.25),fmtP(s-range*0.5),fmtP(s-range)]
  ];
  return '<div style="overflow-x:auto"><table><thead><tr>'+rows[0].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(1).map(row=>'<tr>'+row.map((x,i)=>'<td>'+(i===0?'<b>'+esc(x)+'</b>':esc(x))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="copy"><b>गणना का आधार:</b> Support–Resistance की दूरी का 25% स्टॉप-लॉस बफर, 0.5× दूरी Target 1 और 1× दूरी Target 2 के रूप में दिखाया गया है। ये नियम-आधारित अनुमान हैं, निश्चित परिणाम नहीं। गैप, स्लिपेज, शुल्क और वोलैटिलिटी से वास्तविक जोखिम बदल सकता है। यदि लक्ष्य/स्टॉप भाव शून्य से नीचे हो या स्तर अमान्य हों तो ट्रेड न लें।</p>';
 }
